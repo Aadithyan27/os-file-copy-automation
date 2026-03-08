@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#operation used to copy file function (copy_file). 
+function copy_files() {
+    source=$1
+    destination=$2
+
+#This is to check whether the source folder exists or not. 
+    if [ ! -d $source ]; then
+            echo "Source folder $source does not exist!"
+            return
+    fi
+
+#This is to check whether the source folder exists or not. 
+    if [ -d $destination ]; then
+        read -p "Destination folder $destination already exists. Overwrite? (y/n): " overwrite
+        if [ $overwrite != "y" ]; then
+        echo "Copy task cancelled."
+        return
+        fi
+        rm -r $destination
+    fi
+
+#This is to copy files from the source to destination.
+    cp -r $source $destination
+    echo "Files copied from $ source to $destination"
+}
+
+#This is to check whether the command line parameter is given or not.
+if [ $# -eq 1 ]; then
+    #This is to read the input from the file.
+    input_file=$1
+
+    #This is to check whether the input file exists or not.
+    if [ ! -f $input_file ]; then
+         echo "Input file $input_file does not exist!"
+        exit 1
+    fi
+    #This is to loop through each line in the input file.
+    while read line; do
+        #This is to split the line into source and destination folder paths.
+        src=$(echo $line | cut -d' ' -f1)
+        dest=$(echo $line | cut -d' ' -f2)
+
+        copy_files $source $destination
+    done < $input_file
+else
+    # This is to prompt the user for the source and destination files.  
+    read -p "Enter source folder path: " source
+    read -p "Enter destination folder path: " destination
+
+    copy_files $source $destination
+fi
